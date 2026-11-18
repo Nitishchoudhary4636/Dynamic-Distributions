@@ -7,6 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Salesforce Data Cloud Web SDK (beacon).
+       NOTE: exact script URL Data Cloud > Websites & Mobile Apps > connector > Integration Guidelines se verify karo -->
+  <script src="https://cdn.c360a.salesforce.com/beacon/c360a/fd78e5f7-6b6e-4ea9-9b60-9851e4e17fcf/scripts/c360a.min.js"></script>
+
   <style>
     :root { --ink:#172033; --muted:#687186; --line:#e8ebf0; --brand:#ee5b2a; --navy:#15284b; --yellow:#ffc83d; --green:#2d8a61; }
     * { box-sizing:border-box; }
@@ -30,6 +35,7 @@
     .hero h1 { max-width:520px; margin:0 0 14px; font-family:"Manrope",sans-serif; font-size:52px; line-height:1.02; }
     .hero p { margin:0 0 28px; color:#dfe7f3; }
     .primary { border:0; border-radius:5px; background:var(--brand); color:white; height:46px; padding:0 22px; font-weight:700; cursor:pointer; }
+    .primary:disabled { opacity:.6; cursor:wait; }
     .section { max-width:1180px; margin:54px auto; padding:0 24px; }
     .section-head { display:flex; align-items:end; justify-content:space-between; margin-bottom:18px; }
     .section h2 { margin:0; font-family:"Manrope",sans-serif; font-size:26px; }
@@ -111,9 +117,66 @@
   <div class="toast" id="toast">Request submitted successfully</div>
 
   <script>
+    // ---------- Cart ----------
     let count = 0;
-    document.querySelectorAll('.add').forEach(button => button.addEventListener('click', () => { count++; document.querySelector('#cartCount').textContent = count; button.textContent = 'Added ✓'; setTimeout(() => button.textContent = 'Add to cart', 1200); }));
-    document.querySelector('#quoteForm').addEventListener('submit', event => { event.preventDefault(); const toast = document.querySelector('#toast'); toast.classList.add('show'); event.target.reset(); setTimeout(() => toast.classList.remove('show'), 3000); });
+    document.querySelectorAll('.add').forEach(button => button.addEventListener('click', () => {
+      count++;
+      document.querySelector('#cartCount').textContent = count;
+      button.textContent = 'Added ✓';
+      setTimeout(() => button.textContent = 'Add to cart', 1200);
+    }));
+
+    // ---------- Data Cloud SDK init ----------
+    // Consent hardcoded Opt In = sirf testing ke liye.
+    // Production mein cookie banner / checkbox se asli consent set karo.
+    let sdkReady = false;
+    if (window.SalesforceInteractions) {
+      SalesforceInteractions.init({
+        consents: [{
+          purpose: SalesforceInteractions.ConsentPurpose.Tracking,
+          provider: "Dynamic Distributions",
+          status: SalesforceInteractions.ConsentStatus.OptIn
+        }]
+      }).then(() => { sdkReady = true; console.log('Data Cloud SDK ready'); })
+        .catch(err => console.error('Data Cloud SDK init failed', err));
+    } else {
+      console.warn('Data Cloud beacon script load nahi hua. Script URL aur CORS allowlist check karo.');
+    }
+
+    // ---------- Quote form submit ----------
+    const toast = document.querySelector('#toast');
+    document.querySelector('#quoteForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const f = event.target;
+      const data = Object.fromEntries(new FormData(f).entries());
+
+      if (sdkReady) {
+        try {
+          SalesforceInteractions.sendEvent({
+            interaction: { name: "Quote Request Submit" },
+            user: {
+              identities: {
+                emailAddress: data.email,
+                phoneNumber: data.phone
+              },
+              attributes: {
+                firstName: data.name,
+                productCategory: data.category,
+                message: data.message
+              }
+            }
+          });
+        } catch (e) {
+          console.error('Data Cloud sendEvent failed', e);
+        }
+      } else {
+        console.warn('SDK ready nahi tha, event nahi gaya');
+      }
+
+      toast.classList.add('show');
+      f.reset();
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    });
   </script>
 </body>
 </html>
