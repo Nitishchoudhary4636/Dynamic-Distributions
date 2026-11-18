@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Distributions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#172033; --muted:#687186; --line:#e8ebf0; --brand:#ee5b2a; --navy:#15284b; --yellow:#ffc83d; --green:#2d8a61; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"DM Sans",sans-serif; color:var(--ink); background:#fff; }
+    button,input,select,textarea { font:inherit; }
+    .topbar { height:78px; display:flex; align-items:center; gap:28px; max-width:1180px; margin:auto; padding:0 24px; }
+    .brand { display:flex; align-items:center; gap:10px; width:180px; font-family:"Manrope",sans-serif; font-weight:800; line-height:.95; }
+    .brand-mark { width:38px; height:38px; display:grid; place-items:center; background:var(--navy); color:white; border-radius:7px 7px 15px 7px; font-size:18px; }
+    .search { flex:1; height:44px; display:flex; align-items:center; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+    .search input { border:0; outline:0; width:100%; padding:0 16px; }
+    .search button { width:48px; height:100%; border:0; background:white; cursor:pointer; }
+    .head-actions { display:flex; align-items:center; gap:18px; }
+    .head-actions button { border:0; background:white; color:var(--ink); cursor:pointer; position:relative; }
+    .cart-count { position:absolute; top:-8px; right:-8px; background:var(--brand); color:white; width:17px; height:17px; border-radius:50%; font-size:11px; display:grid; place-items:center; }
+    .catnav { height:46px; background:var(--navy); color:white; }
+    .catnav-inner { max-width:1180px; height:100%; margin:auto; display:flex; align-items:center; gap:8px; padding:0 24px; }
+    .catnav button { border:0; background:transparent; color:white; height:32px; padding:0 10px; font-size:13px; cursor:pointer; border-radius:4px; }
+    .catnav button:hover { background:rgba(255,255,255,.12); }
+    .hero { height:390px; background:linear-gradient(90deg,rgba(8,23,48,.92) 0%,rgba(8,23,48,.5) 48%,rgba(8,23,48,.05) 100%), url("https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=1800&q=85") center/cover; color:white; }
+    .hero-inner { max-width:1180px; height:100%; margin:auto; padding:72px 24px; }
+    .hero h1 { max-width:520px; margin:0 0 14px; font-family:"Manrope",sans-serif; font-size:52px; line-height:1.02; }
+    .hero p { margin:0 0 28px; color:#dfe7f3; }
+    .primary { border:0; border-radius:5px; background:var(--brand); color:white; height:46px; padding:0 22px; font-weight:700; cursor:pointer; }
+    .section { max-width:1180px; margin:54px auto; padding:0 24px; }
+    .section-head { display:flex; align-items:end; justify-content:space-between; margin-bottom:18px; }
+    .section h2 { margin:0; font-family:"Manrope",sans-serif; font-size:26px; }
+    .section-head a { color:var(--brand); text-decoration:none; font-weight:700; }
+    .category-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; }
+    .category { height:150px; border:1px solid var(--line); border-radius:8px; overflow:hidden; text-align:center; background:#f8f9fb; cursor:pointer; transition:.2s; }
+    .category:hover { transform:translateY(-3px); border-color:#bdc6d5; }
+    .category img { width:100%; height:108px; object-fit:cover; }
+    .category strong { display:block; margin-top:10px; font-size:13px; }
+    .promo { display:grid; grid-template-columns:1.1fr 1fr; min-height:290px; background:#f3f6f8; border-radius:8px; overflow:hidden; }
+    .promo-copy { padding:46px; }
+    .promo-copy span { color:var(--brand); font-weight:700; font-size:13px; }
+    .promo-copy h2 { margin:8px 0 12px; font-size:38px; }
+    .promo-copy p { color:var(--muted); max-width:420px; }
+    .promo-image { background:url("https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=85") center/cover; }
+    .product-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+    .product { border:1px solid var(--line); border-radius:8px; padding:14px; position:relative; }
+    .product-badge { position:absolute; z-index:1; top:12px; left:12px; background:#fff3d2; color:#7a5700; border-radius:3px; padding:5px 7px; font-size:11px; font-weight:700; }
+    .product img { width:100%; height:190px; object-fit:cover; border-radius:5px; background:#f4f5f7; }
+    .product h3 { font-size:15px; margin:12px 0 6px; }
+    .product .rating { color:#efad24; font-size:12px; }
+    .price { margin-top:8px; display:flex; align-items:center; gap:8px; }
+    .price strong { color:var(--brand); }
+    .price del { color:#9aa1ae; font-size:12px; }
+    .add { margin-top:12px; width:100%; height:38px; border:1px solid var(--navy); background:white; color:var(--navy); border-radius:5px; font-weight:700; cursor:pointer; }
+    .add:hover { background:var(--navy); color:white; }
+    .form-band { background:var(--navy); color:white; }
+    .form-wrap { max-width:1180px; margin:auto; padding:54px 24px; display:grid; grid-template-columns:.8fr 1.2fr; gap:60px; }
+    .form-wrap h2 { margin:0 0 12px; font-family:"Manrope",sans-serif; font-size:36px; }
+    .form-wrap p { color:#ccd6e7; }
+    form { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    form input,form select,form textarea { width:100%; border:0; border-radius:5px; padding:13px 14px; background:white; outline:none; }
+    form textarea,form .full { grid-column:1/-1; }
+    form textarea { height:88px; resize:vertical; }
+    footer { max-width:1180px; margin:auto; padding:28px 24px; display:flex; justify-content:space-between; color:var(--muted); font-size:13px; }
+    .toast { position:fixed; right:24px; bottom:24px; background:#1d2d47; color:white; padding:14px 18px; border-radius:6px; opacity:0; transform:translateY(12px); transition:.25s; }
+    .toast.show { opacity:1; transform:translateY(0); }
+    @media (max-width:900px) { .category-grid { grid-template-columns:repeat(3,1fr); } .product-grid { grid-template-columns:repeat(2,1fr); } .catnav { overflow:auto; } .head-actions span { display:none; } }
+    @media (max-width:620px) { .topbar { height:auto; padding:14px 16px; flex-wrap:wrap; } .brand { width:auto; } .search { order:3; flex-basis:100%; } .head-actions { margin-left:auto; } .catnav-inner { padding:0 16px; } .hero { height:430px; } .hero-inner { padding:65px 16px; } .hero h1 { font-size:38px; } .section { padding:0 16px; margin:38px auto; } .category-grid { grid-template-columns:repeat(2,1fr); } .promo { grid-template-columns:1fr; } .promo-copy { padding:28px; } .promo-image { min-height:220px; } .product-grid { grid-template-columns:1fr 1fr; gap:10px; } .product img { height:150px; } .form-wrap { grid-template-columns:1fr; gap:28px; padding:42px 16px; } form { grid-template-columns:1fr; } form textarea,form .full { grid-column:auto; } footer { padding:24px 16px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand"><div class="brand-mark">DD</div><div>DYNAMIC<br>DISTRIBUTIONS</div></div>
+      <div class="search"><input id="search" placeholder="Search for products, brands and more" /><button aria-label="Search">⌕</button></div>
+      <div class="head-actions"><button title="Account">♙ <span>Account</span></button><button title="Cart">♡ <span>Wishlist</span></button><button title="Cart" onclick="document.querySelector('.form-band').scrollIntoView({behavior:'smooth'})">🛒 <span>Cart</span><b class="cart-count" id="cartCount">0</b></button></div>
+    </div>
+    <nav class="catnav"><div class="catnav-inner">
+      <button>TV & Appliances</button><button>Kitchen</button><button>Personal Care</button><button>Air Care</button><button>Refrigerators</button><button>Audio</button><button>Computers</button>
+    </div></nav>
+  </header>
+
+  <main>
+    <section class="hero"><div class="hero-inner"><h1>Everyday tech, beautifully selected.</h1><p>Premium appliances and electronics, with delivery you can count on.</p><button class="primary" onclick="document.querySelector('#collections').scrollIntoView({behavior:'smooth'})">Shop collection</button></div></section>
+
+    <section class="section"><div class="section-head"><h2>Shop by category</h2><a href="#collections">View all →</a></div><div class="category-grid">
+      <div class="category"><img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=500&q=80" alt="Televisions"><strong>Televisions</strong></div>
+      <div class="category"><img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80" alt="Kitchen appliances"><strong>Kitchen</strong></div>
+      <div class="category"><img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=500&q=80" alt="Personal care"><strong>Personal care</strong></div>
+      <div class="category"><img src="https://images.unsplash.com/photo-1585336261022-680e295ce3fe?auto=format&fit=crop&w=500&q=80" alt="Air conditioners"><strong>Air care</strong></div>
+      <div class="category"><img src="https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=500&q=80" alt="Refrigerators"><strong>Refrigerators</strong></div>
+      <div class="category"><img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=500&q=80" alt="Audio"><strong>Audio</strong></div>
+    </div></section>
+
+    <section class="section"><div class="promo"><div class="promo-copy"><span>NEW SEASON</span><h2>Comfort starts at home.</h2><p>Explore a curated range of cooling, cleaning and kitchen essentials for every room.</p><button class="primary" onclick="document.querySelector('#collections').scrollIntoView({behavior:'smooth'})">Discover offers</button></div><div class="promo-image"></div></div></section>
+
+    <section class="section" id="collections"><div class="section-head"><h2>Trending this week</h2><a href="#">View all →</a></div><div class="product-grid">
+      <article class="product"><span class="product-badge">Bestseller</span><img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=600&q=80" alt="Hair dryer"><h3>Smart Ionic Hair Dryer</h3><div class="rating">★★★★★ <small>(128)</small></div><div class="price"><strong>₹2,499</strong><del>₹3,299</del></div><button class="add">Add to cart</button></article>
+      <article class="product"><span class="product-badge">New</span><img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80" alt="Cookware"><h3>Premium Cookware Set</h3><div class="rating">★★★★★ <small>(84)</small></div><div class="price"><strong>₹4,890</strong><del>₹6,200</del></div><button class="add">Add to cart</button></article>
+      <article class="product"><span class="product-badge">-18%</span><img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=600&q=80" alt="Smart television"><h3>55-inch QLED Smart TV</h3><div class="rating">★★★★☆ <small>(215)</small></div><div class="price"><strong>₹48,999</strong><del>₹59,999</del></div><button class="add">Add to cart</button></article>
+      <article class="product"><span class="product-badge">Popular</span><img src="https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=600&q=80" alt="Refrigerator"><h3>Double Door Refrigerator</h3><div class="rating">★★★★★ <small>(96)</small></div><div class="price"><strong>₹32,500</strong><del>₹38,000</del></div><button class="add">Add to cart</button></article>
+    </div></section>
+
+    <section class="form-band" id="quote"><div class="form-wrap"><div><span>NEED HELP CHOOSING?</span><h2>Request a quote</h2><p>Tell us what you are looking for. Our product specialists will get back to you shortly.</p></div><form id="quoteForm"><input name="name" placeholder="Full name" required><input name="phone" type="tel" placeholder="Phone number" required><input name="email" type="email" placeholder="Email address" required><select name="category" required><option value="">Product category</option><option>Televisions</option><option>Kitchen appliances</option><option>Personal care</option><option>Air care</option><option>Refrigerators</option></select><textarea class="full" name="message" placeholder="What are you looking for?"></textarea><button class="primary full" type="submit">Send request</button></form></div></section>
+  </main>
+
+  <footer><div>© 2026 Dynamic Distributions</div><div>Secure payments · Easy returns · 24/7 support</div></footer>
+  <div class="toast" id="toast">Request submitted successfully</div>
+
+  <script>
+    let count = 0;
+    document.querySelectorAll('.add').forEach(button => button.addEventListener('click', () => { count++; document.querySelector('#cartCount').textContent = count; button.textContent = 'Added ✓'; setTimeout(() => button.textContent = 'Add to cart', 1200); }));
+    document.querySelector('#quoteForm').addEventListener('submit', event => { event.preventDefault(); const toast = document.querySelector('#toast'); toast.classList.add('show'); event.target.reset(); setTimeout(() => toast.classList.remove('show'), 3000); });
+  </script>
+</body>
+</html>
